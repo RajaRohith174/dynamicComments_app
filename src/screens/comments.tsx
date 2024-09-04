@@ -202,7 +202,7 @@ function Comments(): React.JSX.Element {
                   <View
                     style={{
                       position: 'absolute',
-                      left: windowWidth * 0.74,
+                      left: windowWidth * 0.8,
                     }}>
                     <TouchableOpacity onPress={() => handleDelete(item.id)}>
                       <Trash />
@@ -271,7 +271,7 @@ function Comments(): React.JSX.Element {
                         style={{
                           alignItems: 'flex-end',
                           position: 'absolute',
-                          left: windowWidth * 0.65,
+                          left: windowWidth * 0.71,
                         }}>
                         <TouchableOpacity
                           onPress={() => handleDelete(reply.id)}>
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {color: 'white', fontSize: 14, fontWeight: '700'},
   replySection: {
-    width: windowWidth * 0.88,
+    width: windowWidth * 0.86,
     padding: 10,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -377,6 +377,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   reply: {
+    width: windowWidth * 0.77,
     padding: 10,
     marginLeft: 40,
     marginTop: 5,
