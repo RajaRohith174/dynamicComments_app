@@ -112,13 +112,15 @@ function Comments(): React.JSX.Element {
     <SafeAreaView>
       <View style={styles.container}>
         <View style={styles.commentSection}>
-          <Text style={{color: 'black'}}>Comment</Text>
+          <Text style={{color: 'black', fontSize: 16, fontWeight: '700'}}>
+            Comment
+          </Text>
           <TextInput
             placeholder="Name"
             placeholderTextColor={'#b5b5b5'}
             value={name}
             onChangeText={setName}
-            style={styles.input}
+            style={[styles.input, {height: 40}]}
           />
           <TextInput
             placeholder="Comment"
@@ -126,7 +128,7 @@ function Comments(): React.JSX.Element {
             placeholderTextColor={'#b5b5b5'}
             value={comment}
             onChangeText={setComment}
-            style={[styles.input, {height: 60}]}
+            style={[styles.input, {height: 50}]}
           />
           <View
             style={{
@@ -183,6 +185,37 @@ function Comments(): React.JSX.Element {
                     </TouchableOpacity>
                   </View>
                 </View>
+                {replyingTo === item.id || editingId === item.id ? (
+                  <View style={styles.commentSection}>
+                    <TextInput
+                      placeholder="Name"
+                      placeholderTextColor={'#b5b5b5'}
+                      value={name}
+                      onChangeText={setName}
+                      editable={editingId === null}
+                      style={[styles.input, {height: 40}]}
+                    />
+                    <TextInput
+                      placeholder="Comment"
+                      multiline={true}
+                      placeholderTextColor={'#b5b5b5'}
+                      value={comment}
+                      onChangeText={setComment}
+                      style={[styles.input, {height: 50}]}
+                    />
+                    <View style={{alignItems: 'flex-end'}}>
+                      <TouchableOpacity
+                        onPress={
+                          editingId !== null ? handleSaveEdit : handlePost
+                        }
+                        style={styles.postButton}>
+                        <Text style={styles.buttonText}>
+                          {editingId !== null ? 'SAVE' : 'POST'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : null}
               </View>
               <FlatList
                 data={item.replies}
@@ -203,9 +236,6 @@ function Comments(): React.JSX.Element {
                     </View>
                     <Text style={{color: 'black'}}>{reply.comment}</Text>
                     <View style={styles.actions}>
-                      <TouchableOpacity onPress={() => handleReply(reply.id)}>
-                        <Text style={styles.actionText}>Reply</Text>
-                      </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => handleEdit(reply.id)}
                         style={{paddingLeft: 20}}>
@@ -223,6 +253,38 @@ function Comments(): React.JSX.Element {
                         </TouchableOpacity>
                       </View>
                     </View>
+
+                    {editingId === reply.id ? (
+                      <View style={styles.commentSection}>
+                        <TextInput
+                          placeholder="Name"
+                          placeholderTextColor={'#b5b5b5'}
+                          value={name}
+                          onChangeText={setName}
+                          editable={editingId === null}
+                          style={[styles.input, {height: 40}]}
+                        />
+                        <TextInput
+                          placeholder="Comment"
+                          multiline={true}
+                          placeholderTextColor={'#b5b5b5'}
+                          value={comment}
+                          onChangeText={setComment}
+                          style={[styles.input, {height: 50}]}
+                        />
+                        <View style={{alignItems: 'flex-end'}}>
+                          <TouchableOpacity
+                            onPress={
+                              editingId !== null ? handleSaveEdit : handlePost
+                            }
+                            style={styles.postButton}>
+                            <Text style={styles.buttonText}>
+                              {editingId !== null ? 'SAVE' : 'POST'}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ) : null}
                   </View>
                 )}
               />
@@ -243,7 +305,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#cecece',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
     paddingBottom: 10,
   },
   input: {
@@ -258,12 +320,12 @@ const styles = StyleSheet.create({
   postButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: windowHeight * 0.05,
+    height: windowHeight * 0.04,
     width: windowWidth * 0.24,
     backgroundColor: '#597ef7',
     borderRadius: 4,
   },
-  buttonText: {color: 'white', fontSize: 16, fontWeight: '700'},
+  buttonText: {color: 'white', fontSize: 14, fontWeight: '700'},
   replySection: {
     width: windowWidth * 0.9,
     padding: 10,
