@@ -36,7 +36,7 @@ function App(): React.JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          {/* <Comments /> */}
+          <Comments />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     height: windowHeight,
     width: windowWidth,
     backgroundColor: 'white',
+    padding: 20,
   },
 });
 
