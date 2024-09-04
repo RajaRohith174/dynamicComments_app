@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Trash from '../assets/frame.svg';
+import Arrow from '../assets/downArrow.svg';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -32,7 +33,42 @@ function Comments(): React.JSX.Element {
 
   const getCurrentTime = (): string => {
     const now = new Date();
-    return `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+
+    const day = now.getDate();
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const month = monthNames[now.getMonth()];
+    const year = now.getFullYear();
+
+    const getDaySuffix = (day: number): string => {
+      if (day > 3 && day < 21) return 'th';
+      switch (day % 10) {
+        case 1:
+          return 'st';
+        case 2:
+          return 'nd';
+        case 3:
+          return 'rd';
+        default:
+          return 'th';
+      }
+    };
+
+    const formattedDay = `${day}${getDaySuffix(day)}`;
+
+    return `${formattedDay} ${month} ${year}`;
   };
 
   const validateInput = (text: string): boolean => {
@@ -164,10 +200,19 @@ function Comments(): React.JSX.Element {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+          }}>
           <TouchableOpacity onPress={handleSort}>
-            <Text style={{color: 'black', fontWeight: '700'}}>
-              Sort By: Date and Time
+            <Text
+              style={{
+                color: 'black',
+                fontWeight: '700',
+                marginBottom: 10,
+              }}>
+              Sort By: Date and Time <Arrow />
             </Text>
           </TouchableOpacity>
         </View>
