@@ -35,6 +35,12 @@ function Comments(): React.JSX.Element {
     return `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
   };
 
+  const validateInput = (text: string): boolean => {
+    const maxLength = 20;
+    const regex = /^[a-zA-Z0-9\s]*$/;
+    return text.length <= maxLength && regex.test(text);
+  };
+
   const handlePost = () => {
     if (name && comment) {
       const newComment: Comment = {
@@ -61,7 +67,22 @@ function Comments(): React.JSX.Element {
   };
 
   const handleEdit = (id: number) => {
-    const commentToEdit = comments.find(c => c.id === id);
+    const findCommentOrReplyToEdit = (
+      commentsList: Comment[],
+    ): Comment | null => {
+      for (let comment of commentsList) {
+        if (comment.id === id) {
+          return comment;
+        }
+        const nestedReply = findCommentOrReplyToEdit(comment.replies);
+        if (nestedReply) {
+          return nestedReply;
+        }
+      }
+      return null;
+    };
+
+    const commentToEdit = findCommentOrReplyToEdit(comments);
     if (commentToEdit) {
       setComment(commentToEdit.comment);
       setEditingId(id);
@@ -111,7 +132,11 @@ function Comments(): React.JSX.Element {
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <View style={styles.commentSection}>
+        <View
+          style={[
+            styles.commentSection,
+            {borderColor: '#ccc', borderWidth: 1},
+          ]}>
           <Text style={{color: 'black', fontSize: 16, fontWeight: '700'}}>
             Comment
           </Text>
@@ -119,7 +144,7 @@ function Comments(): React.JSX.Element {
             placeholder="Name"
             placeholderTextColor={'#b5b5b5'}
             value={name}
-            onChangeText={setName}
+            onChangeText={text => validateInput(text) && setName(text)}
             style={[styles.input, {height: 40}]}
           />
           <TextInput
@@ -127,7 +152,7 @@ function Comments(): React.JSX.Element {
             multiline={true}
             placeholderTextColor={'#b5b5b5'}
             value={comment}
-            onChangeText={setComment}
+            onChangeText={text => validateInput(text) && setComment(text)}
             style={[styles.input, {height: 50}]}
           />
           <View
@@ -176,7 +201,6 @@ function Comments(): React.JSX.Element {
                   </TouchableOpacity>
                   <View
                     style={{
-                      alignItems: 'flex-end',
                       position: 'absolute',
                       left: windowWidth * 0.74,
                     }}>
@@ -191,7 +215,9 @@ function Comments(): React.JSX.Element {
                       placeholder="Name"
                       placeholderTextColor={'#b5b5b5'}
                       value={name}
-                      onChangeText={setName}
+                      onChangeText={text =>
+                        validateInput(text) && setName(text)
+                      }
                       editable={editingId === null}
                       style={[styles.input, {height: 40}]}
                     />
@@ -200,7 +226,9 @@ function Comments(): React.JSX.Element {
                       multiline={true}
                       placeholderTextColor={'#b5b5b5'}
                       value={comment}
-                      onChangeText={setComment}
+                      onChangeText={text =>
+                        validateInput(text) && setComment(text)
+                      }
                       style={[styles.input, {height: 50}]}
                     />
                     <View style={{alignItems: 'flex-end'}}>
@@ -236,9 +264,7 @@ function Comments(): React.JSX.Element {
                     </View>
                     <Text style={{color: 'black'}}>{reply.comment}</Text>
                     <View style={styles.actions}>
-                      <TouchableOpacity
-                        onPress={() => handleEdit(reply.id)}
-                        style={{paddingLeft: 20}}>
+                      <TouchableOpacity onPress={() => handleEdit(reply.id)}>
                         <Text style={styles.actionText}>Edit</Text>
                       </TouchableOpacity>
                       <View
@@ -260,7 +286,9 @@ function Comments(): React.JSX.Element {
                           placeholder="Name"
                           placeholderTextColor={'#b5b5b5'}
                           value={name}
-                          onChangeText={setName}
+                          onChangeText={text =>
+                            validateInput(text) && setName(text)
+                          }
                           editable={editingId === null}
                           style={[styles.input, {height: 40}]}
                         />
@@ -269,7 +297,9 @@ function Comments(): React.JSX.Element {
                           multiline={true}
                           placeholderTextColor={'#b5b5b5'}
                           value={comment}
-                          onChangeText={setComment}
+                          onChangeText={text =>
+                            validateInput(text) && setComment(text)
+                          }
                           style={[styles.input, {height: 50}]}
                         />
                         <View style={{alignItems: 'flex-end'}}>
@@ -303,10 +333,12 @@ const styles = StyleSheet.create({
   },
   commentSection: {
     marginBottom: 20,
-    backgroundColor: '#cecece',
+    backgroundColor: '#E6F4FF',
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 10,
+    marginTop: 4,
+    borderRadius: 4,
   },
   input: {
     color: 'black',
@@ -322,17 +354,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: windowHeight * 0.04,
     width: windowWidth * 0.24,
-    backgroundColor: '#597ef7',
+    backgroundColor: '#4096FF',
     borderRadius: 4,
   },
   buttonText: {color: 'white', fontSize: 14, fontWeight: '700'},
   replySection: {
-    width: windowWidth * 0.9,
+    width: windowWidth * 0.88,
     padding: 10,
     borderColor: '#ccc',
     borderWidth: 1,
-    backgroundColor: '#cecece',
+    backgroundColor: '#E6F4FF',
     margin: 4,
+    borderRadius: 4,
   },
   actions: {
     flexDirection: 'row',
@@ -340,14 +373,17 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   actionText: {
-    color: 'blue',
+    color: '#4096FF',
     fontWeight: '700',
   },
   reply: {
     padding: 10,
     marginLeft: 40,
     marginTop: 5,
-    backgroundColor: '#cecece',
+    backgroundColor: '#E6F4FF',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 4,
   },
 });
 
