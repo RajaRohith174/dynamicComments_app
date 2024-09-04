@@ -80,7 +80,20 @@ function Comments(): React.JSX.Element {
   };
 
   const handleDelete = (id: number) => {
-    const updatedComments = comments.filter(c => c.id !== id);
+    const deleteCommentOrReply = (commentsList: Comment[]): Comment[] => {
+      return commentsList
+        .map(comment => {
+          if (comment.id === id) {
+            return null;
+          }
+
+          const updatedReplies = deleteCommentOrReply(comment.replies);
+          return {...comment, replies: updatedReplies};
+        })
+        .filter(comment => comment !== null) as Comment[];
+    };
+
+    const updatedComments = deleteCommentOrReply(comments);
     setComments(updatedComments);
   };
 
@@ -125,58 +138,91 @@ function Comments(): React.JSX.Element {
           </View>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-          <Text style={{color: 'black', fontWeight: '700'}}>
-            Sort By: Date and Time
-          </Text>
+          <TouchableOpacity onPress={handleSort}>
+            <Text style={{color: 'black', fontWeight: '700'}}>
+              Sort By: Date and Time
+            </Text>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={comments}
           keyExtractor={item => item.id.toString()}
-          style={{
-            backgroundColor: '#cecece',
-            paddingHorizontal: 10,
-          }}
           renderItem={({item}) => (
-            <View style={styles.replySection}>
-              <View
-                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{color: 'black', fontWeight: '700'}}>
-                  {item.name}
-                </Text>
-                <Text style={{color: 'black', fontWeight: '700'}}>
-                  {item.time}
-                </Text>
-              </View>
-              <Text style={{color: 'black'}}>{item.comment}</Text>
-              <View style={styles.actions}>
-                <TouchableOpacity onPress={() => handleReply(item.id)}>
-                  <Text style={styles.actionText}>Reply</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleEdit(item.id)}
-                  style={{paddingLeft: 20}}>
-                  <Text style={styles.actionText}>Edit</Text>
-                </TouchableOpacity>
+            <View>
+              <View style={styles.replySection}>
                 <View
                   style={{
-                    alignItems: 'flex-end',
-                    position: 'absolute',
-                    left: windowWidth * 0.74,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
                   }}>
-                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                    <Trash />
+                  <Text style={{color: 'black', fontWeight: '700'}}>
+                    {item.name}
+                  </Text>
+                  <Text style={{color: 'black', fontWeight: '700'}}>
+                    {item.time}
+                  </Text>
+                </View>
+                <Text style={{color: 'black'}}>{item.comment}</Text>
+                <View style={styles.actions}>
+                  <TouchableOpacity onPress={() => handleReply(item.id)}>
+                    <Text style={styles.actionText}>Reply</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleEdit(item.id)}
+                    style={{paddingLeft: 20}}>
+                    <Text style={styles.actionText}>Edit</Text>
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      alignItems: 'flex-end',
+                      position: 'absolute',
+                      left: windowWidth * 0.74,
+                    }}>
+                    <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                      <Trash />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-
               <FlatList
                 data={item.replies}
                 keyExtractor={reply => reply.id.toString()}
                 renderItem={({item: reply}) => (
                   <View style={styles.reply}>
-                    <Text>
-                      {reply.name}: {reply.comment} ({reply.time})
-                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text style={{color: 'black', fontWeight: '700'}}>
+                        {reply.name}
+                      </Text>
+                      <Text style={{color: 'black', fontWeight: '700'}}>
+                        {reply.time}
+                      </Text>
+                    </View>
+                    <Text style={{color: 'black'}}>{reply.comment}</Text>
+                    <View style={styles.actions}>
+                      <TouchableOpacity onPress={() => handleReply(reply.id)}>
+                        <Text style={styles.actionText}>Reply</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleEdit(reply.id)}
+                        style={{paddingLeft: 20}}>
+                        <Text style={styles.actionText}>Edit</Text>
+                      </TouchableOpacity>
+                      <View
+                        style={{
+                          alignItems: 'flex-end',
+                          position: 'absolute',
+                          left: windowWidth * 0.65,
+                        }}>
+                        <TouchableOpacity
+                          onPress={() => handleDelete(reply.id)}>
+                          <Trash />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
                 )}
               />
@@ -219,10 +265,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {color: 'white', fontSize: 16, fontWeight: '700'},
   replySection: {
+    width: windowWidth * 0.9,
     padding: 10,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
+    backgroundColor: '#cecece',
+    margin: 4,
   },
   actions: {
     flexDirection: 'row',
@@ -234,8 +282,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   reply: {
-    marginLeft: 20,
+    padding: 10,
+    marginLeft: 40,
     marginTop: 5,
+    backgroundColor: '#cecece',
   },
 });
 
